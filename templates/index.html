@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Buy cool new product</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://polyfill.io/v3/polyfill.min.js?version=3.52.1&features=fetch"></script>
+  <script src="https://js.stripe.com/v3/"></script>
+</head>
+
+<body>
+  <section>
+    <div class="product">
+      <img src="https://images4-g.ravelrycache.com/uploads/WillowDesigns/692092548/IMG_6624_small2.jpg" alt="Knitted plant pot" />
+      <div class="description">
+        <h3>Knitted plant pot</h3>
+        <h5>€5.00</h5>
+      </div>
+    </div>
+    <button type="button" id="checkout-button">Checkout</button>
+  </section>
+</body>
+<script type="text/javascript">
+  // move this to Heroku settings
+  var stripe = Stripe("pk_test_BzosXuHI59mZzTPQ4D3okpRH00K53nFrRP");
+
+  var checkoutButton = document.getElementById("checkout-button");
+
+  checkoutButton.addEventListener("click", function () {
+    fetch("/create_checkout_session/", {
+        method: "POST",
+      })
+      .then(function (response) {
+        return response.json();
+      })
+      .then(function (session) {
+        return stripe.redirectToCheckout({
+          sessionId: session.id
+        });
+      })
+      .then(function (result) {
+        if (result.error) {
+          alert(result.error.message);
+        }
+      })
+      .catch(function (error) {
+        console.error("Error:", error);
+      });
+  });
+</script>
+
+</html>
